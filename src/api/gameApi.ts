@@ -1,6 +1,6 @@
 import  { User, WithdrawalRequest, Game, TableStake } from '../types';
 
-const   API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';  
+const   API_BASE_URL = 'https://reemteamserver.onrender.com';  
 
 // Helper to get auth headers
 export function getHeaders() {
