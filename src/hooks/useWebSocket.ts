@@ -58,7 +58,7 @@ export function useSocketIO(url: string | null, authToken?: string): WebSocketHo
 }
 
 
-export function useGameSocket(gameId: string | null, token: string) {
+export function useGameWebSocket(gameId: string | null, token: string) {
   const { socket, lastMessage, sendMessage, isConnected } = useSocketIO(
     'https://reemteamserver.onrender.com',
     token
