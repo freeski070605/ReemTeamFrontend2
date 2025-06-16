@@ -24,6 +24,9 @@ export function useSocketIO(url: string | null, authToken?: string): WebSocketHo
       transports: ['websocket']
     });
 
+    console.log('🧪 Initializing Socket.IO with token:', authToken);
+
+
     socketRef.current = newSocket;
     setSocket(newSocket);
 
