@@ -25,12 +25,6 @@ export default function LobbyPage() {
       setError(null);
       
       try {
-        // In development, use mock data
-        if (process.env.NODE_ENV === 'development') {
-          const mockTables = await getMockTables();
-          setTables(mockTables);
-          setPlayerCount(Math.floor(Math.random() * 50) + 20);
-        } else {
           // In production, fetch real data
           const [fetchedTables, count] = await Promise.all([
             fetchTables(),
@@ -107,26 +101,13 @@ export default function LobbyPage() {
     }
     
     try {
-      setIsLoading(true);
-      
-      // In development mode, use mock game
-      if (process.env.NODE_ENV === 'development') {
-        // Simulate delay
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        navigate(`/game/mock-${Date.now()}`);
-           } else {
+        setIsLoading(true);
         const game = await createGame(user.id, table.amount);
         navigate(`/game/${game._id}`);
       } 
     } catch (error) {
       console.error('Error joining game:', error);
       setError('Error initializing game');
-      
-      // Fallback in development mode
-      if (process.env.NODE_ENV === 'development') {
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        navigate(`/game/mock-${Date.now()}`);
-      }
     } finally {
       setIsLoading(false);
     }
