@@ -33,7 +33,7 @@ export default function LobbyPage() {
           
           setTables(fetchedTables);
           setPlayerCount(count);
-        }
+        
       } catch (error) {
         console.error('Error loading lobby data:', error);
         setError('Error loading lobby data');
