@@ -33,6 +33,7 @@ export function useSocketIO(url: string | null, authToken?: string): WebSocketHo
     newSocket.on('connect', () => {
       setIsConnected(true);
       console.log('✅ Socket.IO connected:', newSocket.id);
+      console.error('❌ WebSocket connect error:', err.message);
     });
 
     newSocket.on('disconnect', () => {
