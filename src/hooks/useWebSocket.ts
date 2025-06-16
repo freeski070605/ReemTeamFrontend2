@@ -75,7 +75,7 @@ export function useGameSocket(gameId: string | null, token: string) {
 
 
 
-export function useLobbySocket(token: string) {
+export function useLobbyWebSocket(token: string) {
   const { socket, lastMessage, sendMessage, isConnected } = useSocketIO(
     'https://reemteamserver.onrender.com', // or your env var
     token
