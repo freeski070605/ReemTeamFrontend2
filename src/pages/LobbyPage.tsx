@@ -16,7 +16,8 @@ export default function LobbyPage() {
   const [playerCount, setPlayerCount] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { lastMessage, sendMessage, isConnected } = useLobbyWebSocket();
+  const token = localStorage.getItem('token');
+  const { lastMessage, sendMessage, isConnected } = useLobbyWebSocket(token);
 
   // Fetch tables and player count on mount
   useEffect(() => {
