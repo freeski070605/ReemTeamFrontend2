@@ -104,7 +104,7 @@ export default function LobbyPage() {
         setIsLoading(true);
         const game = await createGame(user.id, table.amount);
         navigate(`/game/${game._id}`);
-      } 
+       
     } catch (error) {
       console.error('Error joining game:', error);
       setError('Error initializing game');
