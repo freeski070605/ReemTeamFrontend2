@@ -20,35 +20,35 @@ export default function LobbyPage() {
 
   // Fetch tables and player count on mount
   useEffect(() => {
-    async function loadLobbyData() {
-      setIsLoading(true);
-      setError(null);
-      
-      try {
-          // In production, fetch real data
-          const [fetchedTables, count] = await Promise.all([
-            fetchTables(),
-            fetchPlayerCount()
-          ]);
-          
-          setTables(fetchedTables);
-          setPlayerCount(count);
-        
-      } catch (error) {
-        console.error('Error loading lobby data:', error);
-        setError('Error loading lobby data');
-        
-        // Fallback to mock data in case of error
-        const mockTables = await getMockTables();
-        setTables(mockTables);
-        setPlayerCount(Math.floor(Math.random() * 50) + 20);
-      } finally {
-        setIsLoading(false);
-      }
-    }
+  async function loadLobbyData() {
+    setIsLoading(true);
+    setError(null);
     
-    loadLobbyData();
-  }, []);
+    try {
+      const [fetchedTables, count] = await Promise.all([
+        fetchTables(),
+        fetchPlayerCount()
+      ]);
+
+      setTables(fetchedTables);
+      setPlayerCount(count);
+
+    } catch (error) {
+      console.error('Error loading lobby data:', error);
+      setError('Error loading lobby data');
+
+      const mockTables = await getMockTables();
+      setTables(mockTables);
+      setPlayerCount(Math.floor(Math.random() * 50) + 20);
+
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  loadLobbyData();
+}, []);
+
 
   // Listen for WebSocket updates
   useEffect(() => {
