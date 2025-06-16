@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useGame } from '../context/GameContext';
 import { useLobbyWebSocket } from '../hooks/useWebSocket';
-import { fetchTables, fetchPlayerCount, getMockTables } from '../api/gameApi';
+import { fetchTables, fetchPlayerCount } from '../api/gameApi';
 import { TableStake } from '../types';
 import { Users, AlertCircle, Shield, Clock } from 'lucide-react';
 import TableStakeCard from '../components/TableStakeCard';
@@ -37,9 +37,7 @@ export default function LobbyPage() {
       console.error('Error loading lobby data:', error);
       setError('Error loading lobby data');
 
-      const mockTables = await getMockTables();
-      setTables(mockTables);
-      setPlayerCount(Math.floor(Math.random() * 50) + 20);
+      
 
     } finally {
       setIsLoading(false);
