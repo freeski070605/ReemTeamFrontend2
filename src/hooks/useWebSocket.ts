@@ -1,115 +1,93 @@
-import   { useState, useEffect, useRef, useCallback } from 'react'; 
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { io, Socket } from 'socket.io-client';
 
 interface WebSocketHook {
-  lastMessage: MessageEvent | null;
-  sendMessage: (data: any) => void;
+  socket: Socket | null;
+  lastMessage: any;
+  sendMessage: (event: string, data: any) => void;
   isConnected: boolean;
 }
 
-export function useWebSocket(url: string | null): WebSocketHook {
-  const [lastMessage, setLastMessage] = useState<MessageEvent | null>(null);
+export function useSocketIO(url: string | null, authToken?: string): WebSocketHook {
+  const [socket, setSocket] = useState<Socket | null>(null);
+  const [lastMessage, setLastMessage] = useState<any>(null);
   const [isConnected, setIsConnected] = useState(false);
-  const wsRef = useRef<WebSocket | null>(null);
+  const socketRef = useRef<Socket | null>(null);
 
-   useEffect(() => {
-    if (!url) {
-      return;
-    }
+  useEffect(() => {
+    if (!url) return;
 
-    // Clean up previous connection
-    if (wsRef.current) {
-      wsRef.current.close();
-    }
+    const newSocket = io(url, {
+      auth: {
+        token: authToken
+      },
+      transports: ['websocket']
+    });
 
-    // For Socket.IO connection, use io library in production
-    // For now, simulate WebSocket connection
-    const connectToSocket = () => {
-      try {
-        // In development, simulate socket connection
-        const mockSocket = {
-          readyState: 1, // OPEN
-          send: (data: string) => {
-            console.log('Mock socket send:', data);
-          },
-          close: () => {
-            setIsConnected(false);
-          }
-        };
-        
-        wsRef.current = mockSocket as any;
-        setIsConnected(true);
-        console.log('Mock WebSocket connected');
-        
-        // Simulate periodic messages for demo
-        const interval = setInterval(() => {
-          if (wsRef.current) {
-            const mockEvent = {
-              data: JSON.stringify({
-                type: 'playerCount',
-                count: Math.floor(Math.random() * 50) + 20
-              })
-            } as MessageEvent;
-            setLastMessage(mockEvent);
-          }
-        }, 10000);
-        
-        return () => {
-          clearInterval(interval);
-          if (wsRef.current) {
-            wsRef.current.close();
-          }
-        };
-      } catch (error) {
-        console.error('WebSocket connection error:', error);
-        setIsConnected(false);
-      }
-    };
+    socketRef.current = newSocket;
+    setSocket(newSocket);
 
-    const cleanup = connectToSocket();
+    newSocket.on('connect', () => {
+      setIsConnected(true);
+      console.log('✅ Socket.IO connected:', newSocket.id);
+    });
+
+    newSocket.on('disconnect', () => {
+      setIsConnected(false);
+      console.log('❌ Socket.IO disconnected');
+    });
+
+    newSocket.onAny((event, data) => {
+      setLastMessage({ event, data });
+    });
 
     return () => {
-      if (cleanup) cleanup();
+      newSocket.disconnect();
     };
-  }, [url]); 
+  }, [url, authToken]);
 
-  const sendMessage = useCallback((data: any) => {
-    if (wsRef.current?.readyState === WebSocket.OPEN) {
-      wsRef.current.send(JSON.stringify(data));
+  const sendMessage = useCallback((event: string, data: any) => {
+    if (socketRef.current?.connected) {
+      socketRef.current.emit(event, data);
     } else {
-      console.error('WebSocket not connected');
+      console.warn('Socket not connected');
     }
   }, []);
 
-  return { lastMessage, sendMessage, isConnected };
+  return { socket, lastMessage, sendMessage, isConnected };
 }
 
-export  function useGameWebSocket(gameId: string | null) {
-  const wsUrl = gameId ? `ws://localhost:5000/socket.io/?EIO=4&transport=websocket` : null;
-  
-  const { lastMessage, sendMessage, isConnected } = useWebSocket(wsUrl);
-  
-  // Send join game message when connected
+
+export function useGameSocket(gameId: string | null, token: string) {
+  const { socket, lastMessage, sendMessage, isConnected } = useSocketIO(
+    'https://reemteamserver.onrender.com',
+    token
+  );
+
   useEffect(() => {
     if (isConnected && gameId) {
-      sendMessage({ type: 'joinGame', gameId });
+      sendMessage('joinGame', gameId);
     }
   }, [isConnected, gameId, sendMessage]);
-  
-  return { lastMessage, sendMessage, isConnected };
-} 
 
-export  function useLobbyWebSocket() {
-  const wsUrl = `ws://localhost:5000/socket.io/?EIO=4&transport=websocket`;
-  
-  const { lastMessage, sendMessage, isConnected } = useWebSocket(wsUrl);
-  
-  // Send join lobby message when connected
+  return { socket, lastMessage, sendMessage, isConnected };
+}
+
+
+
+export function useLobbySocket(token: string) {
+  const { socket, lastMessage, sendMessage, isConnected } = useSocketIO(
+    'https://reemteamserver.onrender.com', // or your env var
+    token
+  );
+
   useEffect(() => {
     if (isConnected) {
-      sendMessage({ type: 'joinLobby' });
+      sendMessage('joinLobby', {});
     }
   }, [isConnected, sendMessage]);
-  
-  return { lastMessage, sendMessage, isConnected };
-} 
+
+  return { socket, lastMessage, sendMessage, isConnected };
+}
+
  
