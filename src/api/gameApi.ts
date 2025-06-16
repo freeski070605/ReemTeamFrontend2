@@ -12,7 +12,7 @@ export function getHeaders() {
 }
 
 // Auth API calls
-export async function loginUser(email: string, password: string): Promise<{ user: User; token: string }> {
+export async function loginUser(username: string, password: string): Promise<{ user: User; token: string }> {
   try {
     const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
       method: 'POST',
